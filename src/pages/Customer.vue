@@ -23,7 +23,7 @@
             </el-table>
         </div>
         <!-- 模态框 -->
-        <el-dialog :title="title" :visible.sync="modelView" @close="dialogCloseHandler">
+        <el-dialog :title="title" :visible.sync="visible" @close="dialogCloseHandler">
         <el-form :model="form" :rules="rules" ref="customerForm">
             <el-form-item label="姓名" label-width="100px;" prop="realname">
                 <el-input v-model="form.realname" autocomplete="off"></el-input>
@@ -66,7 +66,7 @@ import {mapState,mapGetters,mapMutations,mapActions} from 'vuex'
         },
         computed: {
             // 映射，将vuex state中的状态映射为vue中属性
-            ...mapState("customer",["customers","modelView","title"]),
+            ...mapState("customer",["customers","visible","title"]),
             ...mapGetters("customer",["countCustomers","customerStatusFilter"])
             //普通属性
         },

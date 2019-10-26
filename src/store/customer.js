@@ -3,7 +3,7 @@ export default {
     namespaced:true,
     state: {
         //表单显示与隐藏
-        modelView: false,
+        visible: false,
         customers: [],
         title:"添加顾客信息"
     },
@@ -25,10 +25,10 @@ export default {
     },
     mutations: {
         showMo(state) {
-            state.modelView = true;
+            state.visible = true;
         },
         closeMo(state) {
-            state.modelView = false;
+            state.visible = false;
         },
         //需要接受一个参数，这个参数为customers
         refreshCustomers(state,customers) {
