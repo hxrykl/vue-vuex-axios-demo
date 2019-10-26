@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <Customer></Customer>
+    <Categoty></Categoty>
   </div>
 </template>
 
 <script>
 import Customer from './pages/Customer'
-
+import Categoty from './pages/Category'
 export default {
   name: 'app',
   components: {
-    Customer
+    Categoty
   }
 }
 </script>

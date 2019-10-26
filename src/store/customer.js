@@ -1,4 +1,4 @@
-import {get,post} from '../http/axios';
+import {get,post,post_array} from '../http/axios';
 export default {
     namespaced:true,
     state: {
@@ -40,6 +40,14 @@ export default {
         }
     },
     actions: {
+        async batchDeleteCustomer(context,ids){
+            // 1. 批量删除
+            let response = await post_array("/customer/batchDelete",{ids})
+            // 2. 分发
+            context.dispatch("findAllCustomers");
+            // 3. 返回结果
+            return response;
+          },
         async findAllCustomers(context) {
             // console.log("context", context);
             //查询所有顾客信息

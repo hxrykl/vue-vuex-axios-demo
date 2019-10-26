@@ -7,6 +7,7 @@
             <el-button type="danger" size="small" @click="batchDeleteHandler">批量删除</el-button>
         </div>
         <!-- 表格 -->
+        {{ids}}
         <div>
             <el-table :data="customers" size="mini" @selection-change="handleSelectionChange">
                 <el-table-column type="selection"  width="55"></el-table-column>
