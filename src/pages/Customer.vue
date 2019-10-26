@@ -4,22 +4,31 @@
         <!-- 按钮 -->
         <div class="btns">
             <el-button @click="toAddHandler" type="primary" size="small">添加</el-button>
-            <el-button type="danger" size="small">批量删除</el-button>
+            <el-button type="danger" size="small" @click="batchDeleteHandler">批量删除</el-button>
         </div>
-        <!-- 表单 -->
-        <!-- <form action="" v-show="visible" @submit.prevent="submitHandler">
-            姓名<input type="text" v-model="form.realname">
-            手机<input type="text" v-model="form.telephone">
-            <input type="submit" value="提交">
-            <input type="reset" value="取消" @click="closeMo">
-        </form> -->
+        <!-- 表格 -->
+        <div>
+            <el-table :data="customers" size="mini" @selection-change="handleSelectionChange">
+                <el-table-column type="selection"  width="55"></el-table-column>
+                <el-table-column prop="id" label="编号"></el-table-column>
+                <el-table-column prop="realname" label="姓名"></el-table-column>
+                <el-table-column prop="telephone" label="手机号"></el-table-column>
+                <el-table-column prop="status" label="状态"></el-table-column>
+                <el-table-column  label="操作" width="100px">
+                    <template #default="record">
+                        <a href="" class="el-icon-delete" @click.prevent="deleteHandler(record.row.id)"></a>&nbsp;
+                        <a href="" class="el-icon-edit-outline" @click.prevent="editHandler(record.row)"></a>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
         <!-- 模态框 -->
-        <el-dialog title="添加顾客信息" :visible.sync="visible">
-        <el-form :model="form" :rules="rules">
-            <el-form-item label="姓名" label-width="50px;" prop="realname">
-                <el-input v-model="form.relaname" autocomplete="off"></el-input>
+        <el-dialog :title="title" :visible.sync="modelView" @close="dialogCloseHandler">
+        <el-form :model="form" :rules="rules" ref="customerForm">
+            <el-form-item label="姓名" label-width="100px;" prop="realname">
+                <el-input v-model="form.realname" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="手机号" label-width="50px;" prop="telephone">
+            <el-form-item label="手机号" label-width="100px;" prop="telephone">
                 <el-input v-model="form.telephone" autocomplete="off"></el-input>
             </el-form-item>
         </el-form>
@@ -28,20 +37,6 @@
             <el-button type="primary" @click="submitHandler">确 定</el-button>
         </div>
         </el-dialog>
-        <!-- 表格 -->
-        <el-table :data="customers">
-            <el-table-column type="selection"  width="55"></el-table-column>
-            <el-table-column prop="id" label="编号"></el-table-column>
-            <el-table-column prop="realname" label="姓名"></el-table-column>
-            <el-table-column prop="telephone" label="手机号"></el-table-column>
-            <el-table-column prop="status" label="状态"></el-table-column>
-            <el-table-column  label="操作" width="100px">
-                <template #default="record">
-                    <a href="" class="el-icon-delete" @click.prevent="deleteHandler(record.row.id)"></a>
-                    <a href="" class="el-icon-edit-outline" @click.prevent="deleteHandler(recprd.row)"></a>
-                </template>
-            </el-table-column>
-        </el-table>
     </div>
 </template>  
 
@@ -51,6 +46,8 @@ import {mapState,mapGetters,mapMutations,mapActions} from 'vuex'
     export default{
         data(){
             return {
+                customer:{},
+                ids:[],
                 form:{},
                 rules:{
                     realname: [
@@ -69,26 +66,42 @@ import {mapState,mapGetters,mapMutations,mapActions} from 'vuex'
         },
         computed: {
             // 映射，将vuex state中的状态映射为vue中属性
-            ...mapState("customer",["customers","visible"]),
+            ...mapState("customer",["customers","modelView","title"]),
             ...mapGetters("customer",["countCustomers","customerStatusFilter"])
             //普通属性
         },
         methods: {
          	//映射，将action中得到动作映射为vue中的方法
-            ...mapActions("customer",["findAllCustomers","deleteCustomerById","saveOrUpdateCustomer"]),
-            ...mapMutations("customer",["showMo","closeMo"]),
+            ...mapActions("customer",["findAllCustomers","deleteCustomerById","saveOrUpdateCustomer","batchDeleteCustomer"]),
+            ...mapMutations("customer",["showMo","closeMo","setTitle"]),
             //普通方法
+            dialogCloseHandler(){
+                this.$refs.customerForm.resetFields();
+            },
+            handleSelectionChange(val){
+                this.ids = val.map(item=>item.id);
+            },
             toAddHandler(){
-            	//	
-            	this.showMo();
+                //重置表单
+                this.customer = {};
+                this.setTitle("添加顾客信息");
+                this.showMo();
+                
             },
             submitHandler() {
-            	//表单验证
-            	//提交表单
-            	this.saveOrUpdateCustomer(this.form)
-            	.then((response)=>{
-            		this.$message({type:"success",message:response.statusText});
-            	})
+                //表单验证
+                this.$refs.customerForm.validate((valid)=>{
+                    if(valid){
+                        //提交表单
+                        this.saveOrUpdateCustomer(this.form)
+                        .then((response)=>{
+                            this.$message({type:"success",message:response.statusText});
+                        })
+                    }else{
+                        return false;
+                    }
+                })
+            	
             	console.log("vue",this.form);
             },
             deleteHandler(id) {
@@ -100,8 +113,15 @@ import {mapState,mapGetters,mapMutations,mapActions} from 'vuex'
             	
             },
             editHandler(row) {
-            	this.form = row;
+                this.form = row;
+                this.setTitle("修改顾客信息");
             	this.showMo();
+            },
+            batchDeleteHandler(){
+                this.batchDeleteCustomer(this.ids)
+                .then((response)=>{
+                    this.$message({type:"success",message:response.statusText});
+                })
             }
         }
     }

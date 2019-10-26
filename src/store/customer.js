@@ -3,9 +3,9 @@ export default {
     namespaced:true,
     state: {
         //表单显示与隐藏
-        visible: false,
-        //
-        customers: []
+        modelView: false,
+        customers: [],
+        title:"添加顾客信息"
     },
     getters:{
         countCustomers(state){
@@ -25,16 +25,18 @@ export default {
     },
     mutations: {
         showMo(state) {
-            state.visible = true;
-
+            state.modelView = true;
         },
         closeMo(state) {
-            state.visible = false;
+            state.modelView = false;
         },
         //需要接受一个参数，这个参数为customers
         refreshCustomers(state,customers) {
             // console.log("state", state);
             state.customers = customers;
+        },
+        setTitle(state,title){
+            state.title = title;
         }
     },
     actions: {
