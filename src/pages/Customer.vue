@@ -3,8 +3,8 @@
         <h2>顾客管理</h2>
         <!-- 按钮 -->
         <div class="btns">
-            <button @click="toAddHandler">添加</button>
-            <button>批量删除</button>
+            <el-button @click="toAddHandler" type="primary" size="small">添加</el-button>
+            <el-button type="danger" size="small">批量删除</el-button>
         </div>
         <!-- 表单 -->
         <form action="" v-show="visible" @submit.prevent="submitHandler">
@@ -13,31 +13,57 @@
             <input type="submit" value="提交">
             <input type="reset" value="取消" @click="closeMo">
         </form>
-        <!-- 表格 -->
-        <table>
-            <thead>
-                <tr>
-                    <th>编号</th>
-                    <th>姓名</th>
-                    <th>手机号</th>
-                    <th>状态</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="c in customerStatusFilter()" :key="c.id">
-                    <td>{{c.id}}</td>
-                    <td>{{c.realname}}</td>
-                    <td>{{c.telephone}}</td>
-                    <td>{{c.status}}</td>
 
-                    <td>
-                        <a href="" @click.prevent="deleteHandler(c.id)">删除</a>
-                        <a href="" @click.prevent="editHandler(c)">修改</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <el-button type="text" @click="dialogFormVisible = true">打开嵌套表单的 Dialog</el-button>
+
+        <el-dialog title="添加顾客信息" :visible.sync="visible">
+        <el-form :model="form">
+            <el-form-item label="姓名" label-width="100px;">
+                <el-input v-model="form.name" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="手机号" label-width="100px;">
+                <el-input v-model="form.name" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="活动区域" :label-width="formLabelWidth">
+            <el-select v-model="form.region" placeholder="请选择活动区域">
+                <el-option label="区域一" value="shanghai"></el-option>
+                <el-option label="区域二" value="beijing"></el-option>
+            </el-select>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisible = false">取 消</el-button>
+            <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        </div>
+        </el-dialog>
+        <!-- 表格 -->
+        <el-table :data="customers">
+            <el-table-column type="selection"  width="55"></el-table-column>
+            <el-table-column prop="id" label="编号"></el-table-column>
+            <el-table-column prop="realname" label="姓名"></el-table-column>
+            <el-table-column prop="telephone" label="手机号"></el-table-column>
+            <el-table-column prop="status" label="状态"></el-table-column>
+            <el-table-column  label="操作">
+                <template #default="record">
+                    <a href="" @click.prevent="deleteHandler(record.row.id)">删除</a>
+                    <a href="" @click.prevent="deleteHandler(recprd.row)">修改</a>
+                </template>
+            </el-table-column>
+        </el-table>
+        <!-- <el-table :data="customers" size="mini"  @selection-change="handleSelectionChange">
+        <el-table-column type="selection" width="55"></el-table-column>
+        <el-table-column prop="id" label="编号"></el-table-column>
+        <el-table-column prop="realname" label="姓名"></el-table-column>
+        <el-table-column prop="telephone" label="手机号"></el-table-column>
+        <el-table-column prop="status" label="状态"></el-table-column>
+        <el-table-column label="操作">
+          <template #default="record">
+              <i class="el-icon-delete" href="" @click.prevent="deleteHandler(record.row.id)"></i> &nbsp;
+							<i class="el-icon-edit-outline" href="" @click.prevent="editHandler(record.row)"></i>
+          </template>
+        </el-table-column>
+      </el-table> -->
+        
     </div>
 </template>  
 
@@ -47,6 +73,7 @@ import {mapState,mapGetters,mapMutations,mapActions} from 'vuex'
     export default{
         data(){
             return {
+                customer:{},
                 form:{}
             }
         },
